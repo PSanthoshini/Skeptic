@@ -20,24 +20,15 @@ export default function Dashboard() {
       navigate('/login');
     }
     
-    const confirmPayment = async () => {
-      const sessionId = searchParams.get('session_id');
-      if (sessionId) {
-        try {
-          await api.post('/api/stripe/confirm-payment', { session_id: sessionId });
-          await refreshUser();
-          navigate('/dashboard', { replace: true });
-        } catch (err) {
-          console.error('Payment confirmation failed:', err);
-        }
-      } else if (searchParams.get('payment') === 'success') {
-        refreshUser();
+    const checkPaymentStatus = async () => {
+      if (searchParams.get('payment') === 'success') {
+        await refreshUser();
         navigate('/dashboard', { replace: true });
       }
     };
 
     if (searchParams.get('payment') === 'success') {
-      confirmPayment();
+      checkPaymentStatus();
     }
   }, [user, loading, navigate, searchParams, refreshUser]);
 

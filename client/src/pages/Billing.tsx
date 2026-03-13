@@ -8,16 +8,9 @@ export default function Billing() {
   const [loading, setLoading] = useState(false);
 
   const handleManageSubscription = async () => {
-    setLoading(true);
-    try {
-      const { data } = await api.post('/api/stripe/create-portal-session', {});
-      window.location.href = data.url;
-    } catch (error) {
-      console.error('Failed to create portal session:', error);
-      alert('Failed to open billing portal. If you are on the FREE plan, you do not have a billing customer yet.');
-    } finally {
-      setLoading(false);
-    }
+    // Razorpay does not have a drop-in billing portal like Stripe.
+    // Usually you would build a custom UI for this or direct them to support.
+    alert('Subscription management is currently handled through support. Please contact us to change your plan.');
   };
 
   const formatDate = (dateString: string) => {
@@ -33,7 +26,7 @@ export default function Billing() {
     <div className="py-24 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
       <div className="mb-12">
         <h1 className="text-3xl font-bold mb-2">Billing & Subscription</h1>
-        <p className="text-zinc-400">Manage your plan, payment methods, and billing history.</p>
+        <p className="text-zinc-400">Manage your plan and billing history.</p>
       </div>
 
       <div className="grid grid-cols-1 gap-8">
@@ -61,7 +54,7 @@ export default function Billing() {
             <div className="space-y-4 mb-8">
               <div className="flex items-center gap-2 text-sm text-zinc-300">
                 <Clock className="w-4 h-4 text-zinc-500" />
-                <span>Next billing date: {user?.subscription_plan === 'free' ? 'None' : 'Calculated by Stripe'}</span>
+                <span>Next billing date: {user?.subscription_plan === 'free' ? 'None' : 'Calculated by Razorpay'}</span>
               </div>
               <div className="flex items-center gap-2 text-sm text-zinc-300">
                 <CheckCircle2 className="w-4 h-4 text-zinc-500" />
@@ -75,14 +68,8 @@ export default function Billing() {
                 disabled={loading || user?.subscription_plan === 'free'}
                 className="flex-1 bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 disabled:cursor-not-allowed text-zinc-50 py-3 px-6 rounded-xl font-medium transition-all duration-200 flex items-center justify-center gap-2"
               >
-                {loading ? (
-                  <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <>
-                    <Settings className="w-4 h-4" />
-                    Manage Subscription
-                  </>
-                )}
+                <Settings className="w-4 h-4" />
+                Manage Subscription
               </button>
               
               {user?.subscription_plan === 'free' && (
@@ -98,7 +85,7 @@ export default function Billing() {
           
           <div className="bg-zinc-950/50 border-t border-zinc-800 p-6">
             <p className="text-xs text-zinc-500 text-center">
-              Subscriptions are managed securely via Stripe. You can cancel at any time.
+              Subscriptions are managed securely via Razorpay. You can cancel at any time.
             </p>
           </div>
         </div>

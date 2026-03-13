@@ -3,6 +3,12 @@ import { Check, ArrowRight, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../lib/api';
 
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
+
 export default function Pricing() {
   const { user } = useAuth();
   const [loading, setLoading] = useState<string | null>(null);
@@ -15,10 +21,41 @@ export default function Pricing() {
 
     setLoading(plan);
     try {
-      const { data } = await api.post('/api/stripe/create-checkout-session', { plan });
-      window.location.href = data.url;
+      const { data } = await api.post('/api/razorpay/create-subscription', { plan });
+      
+      const options = {
+        key: data.key_id,
+        subscription_id: data.subscription_id,
+        name: 'Skeptic',
+        description: `${plan.charAt(0).toUpperCase() + plan.slice(1)} Plan Subscription`,
+        image: '/logo.png', // Replace with your actual logo
+        handler: async (response: any) => {
+          try {
+            await api.post('/api/razorpay/verify-payment', {
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_subscription_id: response.razorpay_subscription_id,
+              razorpay_signature: response.razorpay_signature,
+              plan
+            });
+            window.location.href = '/dashboard?payment=success';
+          } catch (error) {
+            console.error('Payment verification failed:', error);
+            alert('Payment verification failed. Please contact support.');
+          }
+        },
+        prefill: {
+          name: user.name || '',
+          email: user.email || '',
+        },
+        theme: {
+          color: '#10b981',
+        },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
     } catch (error) {
-      console.error('Failed to create checkout session:', error);
+      console.error('Failed to create subscription:', error);
       alert('Failed to start checkout. Please try again.');
     } finally {
       setLoading(null);
@@ -147,10 +184,10 @@ export default function Pricing() {
       <div className="mt-16 flex flex-col items-center justify-center gap-4 text-zinc-500 text-sm">
         <div className="flex items-center gap-2">
           <ShieldCheck className="w-5 h-5 text-emerald-500/50" />
-          <span>Secure payments powered by Stripe</span>
+          <span>Secure payments powered by Razorpay</span>
         </div>
         <div className="flex gap-4">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg" alt="Stripe" className="h-6 opacity-50" />
+          <img src="https://razorpay.com/assets/razorpay-logo-white.svg" alt="Razorpay" className="h-6 opacity-50" />
         </div>
       </div>
     </div>

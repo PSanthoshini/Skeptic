@@ -143,7 +143,7 @@ export default function LandingPage() {
                   type="text"
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
-                  placeholder="Paste your website URL (e.g., stripe.com)"
+                  placeholder="Paste your website URL (e.g., razorpay.com)"
                   className="flex-1 bg-transparent border-none focus:outline-none text-zinc-100 placeholder:text-zinc-600 py-4 text-lg"
                   required
                 />
