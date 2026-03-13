@@ -1,17 +1,14 @@
+import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import dotenv from 'dotenv';
 import authRoutes from './routes/auth.js';
 import analyzeRoutes from './routes/analyze.js';
 import reportRoutes from './routes/reports.js';
 import razorpayRoutes from './routes/razorpay.js';
 
-dotenv.config({ path: '.env' });
-
 const app = express();
 
-// CORS: Dynamically allow the requester's origin
 app.use(cors({
   origin: true,
   credentials: true,
@@ -25,5 +22,6 @@ app.use('/api/analyze', analyzeRoutes);
 app.use('/api/reports', reportRoutes);
 app.use('/api/razorpay', razorpayRoutes);
 
-// Hardcoded Port
-app.listen(5000);
+app.listen(5000, () => {
+  console.log('Backend API running on http://localhost:5000');
+});

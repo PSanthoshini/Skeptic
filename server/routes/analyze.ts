@@ -130,7 +130,6 @@ Nav Items: ${content.navItems?.join(' | ') || ''}`;
     const text = completion.choices[0]?.message?.content || '{}';
     res.json(JSON.parse(text));
   } catch (error: any) {
-    console.error('Groq error:', error);
     res.status(500).json({ error: 'Failed to generate AI report' });
   }
 });
@@ -175,7 +174,6 @@ router.post('/save', authenticate, async (req: AuthRequest, res) => {
 
     res.json({ id: report.id });
   } catch (error: any) {
-    console.error('Save report error:', error);
     res.status(500).json({ error: error.message });
   }
 });

@@ -28,7 +28,7 @@ export default function Pricing() {
         subscription_id: data.subscription_id,
         name: 'Skeptic',
         description: `${plan.charAt(0).toUpperCase() + plan.slice(1)} Plan Subscription`,
-        image: '/logo.png', // Replace with your actual logo
+        image: '/logo.png',
         handler: async (response: any) => {
           try {
             await api.post('/api/razorpay/verify-payment', {
@@ -54,7 +54,7 @@ export default function Pricing() {
 
       const rzp = new window.Razorpay(options);
       rzp.open();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to create subscription:', error);
       alert('Failed to start checkout. Please try again.');
     } finally {

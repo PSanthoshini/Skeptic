@@ -12,8 +12,8 @@ const razorpay = new Razorpay({
 });
 
 const PLAN_IDS: Record<string, string> = {
-  pro: 'plan_pro_id_here', // Replace with actual Razorpay Plan ID
-  agency: 'plan_agency_id_here', // Replace with actual Razorpay Plan ID
+  pro: 'plan_SQoh9QT4IYESEh',
+  agency: 'plan_SQokLVzyr0A3XO',
 };
 
 // Create a subscription
@@ -29,7 +29,7 @@ router.post('/create-subscription', authenticate, async (req: AuthRequest, res) 
     const subscription = await razorpay.subscriptions.create({
       plan_id: PLAN_IDS[plan],
       customer_notify: 1,
-      total_count: 12, // For 1 year, or whatever you prefer
+      total_count: 12,
       notes: {
         userId: userId || '',
         plan: plan,
@@ -53,7 +53,7 @@ router.post('/verify-payment', authenticate, async (req: AuthRequest, res) => {
     razorpay_signature,
     plan
   } = req.body;
-  
+
   const userId = req.user?.id;
 
   const secret = process.env.RAZORPAY_KEY_SECRET || '';
@@ -70,8 +70,6 @@ router.post('/verify-payment', authenticate, async (req: AuthRequest, res) => {
           subscription_plan: plan,
           subscription_status: 'active',
           subscription_start_date: new Date().toISOString(),
-          // We can still use the stripe_customer_id column OR rename it in the DB later.
-          // For now, let's just update the plan status.
         })
         .eq('id', userId);
 
@@ -84,8 +82,6 @@ router.post('/verify-payment', authenticate, async (req: AuthRequest, res) => {
   }
 });
 
-// Webhook removed as requested. 
-// Note: Manual verification via /verify-payment handles the initial activation.
-// Subscription cancellations or renewals won't be synced automatically without webhooks.
+// Webhook removed as requested.
 
 export default router;
