@@ -3,10 +3,12 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import db from '../db.js';
 import { authenticate, AuthRequest } from '../middleware/auth.js';
+import { authLimiter } from '../middleware/security.js';
+import { env } from '../config/env.js';
 
 const router = express.Router();
 
-router.post('/signup', async (req, res) => {
+router.post('/signup', authLimiter, async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
 
@@ -28,10 +30,10 @@ router.post('/signup', async (req, res) => {
 
     const token = jwt.sign(
       { id: user.id, email: user.email },
-      process.env.JWT_SECRET || 'your_jwt_secret_key_here',
+      env.JWT_SECRET, // Strictly enforced secret, no hardcoded fallbacks
       { expiresIn: '7d' }
     );
-    const isProduction = process.env.NODE_ENV === 'production';
+    const isProduction = env.NODE_ENV === 'production';
     res.cookie('token', token, { 
       httpOnly: true, 
       secure: isProduction, 
@@ -44,7 +46,7 @@ router.post('/signup', async (req, res) => {
   }
 });
 
-router.post('/login', async (req, res) => {
+router.post('/login', authLimiter, async (req, res) => {
   const { email, password } = req.body;
 
   try {
@@ -61,10 +63,10 @@ router.post('/login', async (req, res) => {
 
     const token = jwt.sign(
       { id: user.id, email: user.email },
-      process.env.JWT_SECRET || 'your_jwt_secret_key_here',
+      env.JWT_SECRET,
       { expiresIn: '7d' }
     );
-    const isProduction = process.env.NODE_ENV === 'production';
+    const isProduction = env.NODE_ENV === 'production';
     res.cookie('token', token, { 
       httpOnly: true, 
       secure: isProduction, 
@@ -78,7 +80,7 @@ router.post('/login', async (req, res) => {
 });
 
 router.post('/logout', (req, res) => {
-  const isProduction = process.env.NODE_ENV === 'production';
+  const isProduction = env.NODE_ENV === 'production';
   res.clearCookie('token', { 
     httpOnly: true, 
     secure: isProduction, 

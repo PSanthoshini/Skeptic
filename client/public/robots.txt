@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /report/
+
+Sitemap: https://skeptic-ai.onrender.com/sitemap.xml

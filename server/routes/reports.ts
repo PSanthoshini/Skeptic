@@ -20,16 +20,19 @@ router.get('/', authenticate, async (req: AuthRequest, res) => {
   }
 });
 
-router.get('/:id', async (req, res) => {
+router.get('/:id', authenticate, async (req: AuthRequest, res) => {
   const { id } = req.params;
+  const userId = req.user?.id;
+  
   try {
     const { data: report, error } = await db
       .from('reports')
       .select('*, users(subscription_plan)')
       .eq('id', id)
+      .eq('user_id', userId) // <-- Prevent IDOR (Insecure Direct Object Reference)
       .single();
 
-    if (error || !report) return res.status(404).json({ error: 'Report not found' });
+    if (error || !report) return res.status(404).json({ error: 'Report not found or unauthorized' });
 
     const ownerPlan = (report as any).users?.subscription_plan || 'free';
 
